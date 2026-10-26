@@ -1,0 +1,17 @@
+HzLab
+Copyright (C) 2026 Mohammed Alam Khan and contributors.
+
+HzLab is an independent, clean-room project. It is not affiliated with,
+endorsed by, or sponsored by the original PitchLab project or its author.
+
+No source code, binary libraries, artwork, icons, screenshots, layouts or
+other assets from PitchLab are included in this repository. The app name,
+logo, UI text, source code, visualisers and audio pipeline were created for
+this project.
+
+The built-in tuning presets (instrument names and note lists) and temperament
+presets (historical cent offsets) are factual musical data. They are included
+so musicians can use common tunings and historical temperaments.
+
+The app records audio only while it is open and only to analyse pitch locally.
+It contains no advertising, analytics, tracking or network permission.

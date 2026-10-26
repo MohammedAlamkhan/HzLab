@@ -1,0 +1,31 @@
+# Build outputs
+build/
+dist/
+app/build/
+*.apk
+*.aab
+*.idsig
+*.ap_
+*.dex
+*.class
+
+# Signing material — never commit
+signing/
+*.jks
+*.keystore
+*.pass
+
+# Local SDK / IDE
+tools/
+local.properties
+.gradle/
+.idea/
+*.iml
+.DS_Store
+
+# Analysis material from the original app; not part of HzLab
+original/
+source/
+reference/
+phase1/
+hzlab_old/
