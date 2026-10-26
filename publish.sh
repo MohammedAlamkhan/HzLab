@@ -17,8 +17,10 @@ fi
 
 # Guard against accidentally publishing an outdated binary.
 ./build.sh release
+ANDROID_HOME="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-$ROOT/../tools/android-sdk}}"
+BT="$ANDROID_HOME/build-tools/35.0.0"
 HASH="$(sha256sum dist/HzLab-1.0.0.apk | awk '{print $1}')"
-CERT="$(apksigner verify --print-certs dist/HzLab-1.0.0.apk | awk -F': ' '/certificate SHA-256/{print $2; exit}')"
+CERT="$("$BT/apksigner" verify --print-certs dist/HzLab-1.0.0.apk | awk -F': ' '/certificate SHA-256/{print $2; exit}')"
 cat > dist/SHA256SUMS.txt <<EOF
 $HASH  HzLab-1.0.0.apk
 

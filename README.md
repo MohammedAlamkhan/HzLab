@@ -148,6 +148,8 @@ The first build creates a local signing key under `signing/`. That directory is 
 
 The build is intentionally tool-light: `aapt2`, `javac`, `d8`, `zipalign` and `apksigner` from the Android SDK/JDK. No Gradle or Android Studio is required.
 
+Maintainers: see [PUBLISHING.md](PUBLISHING.md) for the release workflow.
+
 ## Project layout
 
 ```
