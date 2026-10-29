@@ -1,0 +1,1 @@
+First public HzLab release: Instrument, Dial & Strobe, Spectrogram, Chords and Big Strobe; 52 tunings; 17 temperaments; custom editors; A4 reference; fully offline.

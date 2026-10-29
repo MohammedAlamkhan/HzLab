@@ -19,26 +19,26 @@ fi
 ./build.sh release
 ANDROID_HOME="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-$ROOT/../tools/android-sdk}}"
 BT="$ANDROID_HOME/build-tools/35.0.0"
-HASH="$(sha256sum dist/HzLab-1.0.0.apk | awk '{print $1}')"
-CERT="$("$BT/apksigner" verify --print-certs dist/HzLab-1.0.0.apk | awk -F': ' '/certificate SHA-256/{print $2; exit}')"
+HASH="$(sha256sum dist/HzLab-1.0.1.apk | awk '{print $1}')"
+CERT="$("$BT/apksigner" verify --print-certs dist/HzLab-1.0.1.apk | awk -F': ' '/certificate SHA-256/{print $2; exit}')"
 cat > dist/SHA256SUMS.txt <<EOF
-$HASH  HzLab-1.0.0.apk
+$HASH  HzLab-1.0.1.apk
 
 Signing certificate (SHA-256):
 $CERT
 EOF
 
 git push -u origin main
-git push origin v1.0.0 2>/dev/null || true
-if gh release view v1.0.0 >/dev/null 2>&1; then
-  gh release upload v1.0.0 dist/HzLab-1.0.0.apk dist/SHA256SUMS.txt --clobber
+git push origin v1.0.1 2>/dev/null || true
+if gh release view v1.0.1 >/dev/null 2>&1; then
+  gh release upload v1.0.1 dist/HzLab-1.0.1.apk dist/SHA256SUMS.txt --clobber
 else
-  gh release create v1.0.0 \
-    dist/HzLab-1.0.0.apk \
+  gh release create v1.0.1 \
+    dist/HzLab-1.0.1.apk \
     dist/SHA256SUMS.txt \
-    --title "HzLab 1.0.0" \
-    --notes-file docs/release-notes-1.0.0.md \
+    --title "HzLab 1.0.1" \
+    --notes-file docs/release-notes-1.0.1.md \
     --verify-tag
 fi
 
-echo "Published: https://github.com/MohammedAlamkhan/HzLab/releases/tag/v1.0.0"
+echo "Published: https://github.com/MohammedAlamkhan/HzLab/releases/tag/v1.0.1"

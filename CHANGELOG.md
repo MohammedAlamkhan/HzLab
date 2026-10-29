@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.1 — F-Droid preparation
+
+- Add Fastlane listing metadata (title, descriptions, screenshots, changelogs).
+- Add `fdroid-build.sh`, a portable unsigned build path for F-Droid's build server.
+- Add build-tools/platform fallback discovery so the manual build works across SDK installations.
+- No changes to audio processing or the five visualisers.
+
+
 ## 1.0.0 — first public HzLab release
 
 - Clean-room HzLab app, package `io.github.mohammedalamkhan.hzlab`.

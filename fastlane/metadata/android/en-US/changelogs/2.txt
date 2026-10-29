@@ -1,0 +1,1 @@
+HzLab 1.0.1 prepares the project for F-Droid: portable unsigned build recipe, Fastlane listing metadata, and the same five tuning views and offline DSP as 1.0.0. No audio or display behaviour changes.

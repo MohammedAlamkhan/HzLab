@@ -30,9 +30,9 @@ This is a **clean-room reimplementation**, not a repackaging of the original app
 
 Get the latest signed APK from the [GitHub Releases page](https://github.com/MohammedAlamkhan/HzLab/releases/latest).
 
-Direct file for `v1.0.0`:
+Direct file for `v1.0.1`:
 
-**[HzLab-1.0.0.apk](https://github.com/MohammedAlamkhan/HzLab/releases/download/v1.0.0/HzLab-1.0.0.apk)**
+**[HzLab-1.0.1.apk](https://github.com/MohammedAlamkhan/HzLab/releases/download/v1.0.1/HzLab-1.0.1.apk)**
 
 - Android 6.0 (API 23) or newer
 - arm64, armeabi-v7a or x86 — no ABI-specific binaries
@@ -48,7 +48,7 @@ Direct file for `v1.0.0`:
 ### Install with ADB
 
 ```bash
-adb install -r HzLab-1.0.0.apk
+adb install -r HzLab-1.0.1.apk
 ```
 
 ## Screenshots
@@ -140,15 +140,15 @@ Requirements:
 ```bash
 git clone https://github.com/MohammedAlamkhan/HzLab.git
 cd HzLab
-./build.sh debug      # unsigned debug tooling key, dist/HzLab-1.0.0-debug.apk
-./build.sh release    # local release key, dist/HzLab-1.0.0.apk
+./build.sh debug      # unsigned debug tooling key, dist/HzLab-1.0.1-debug.apk
+./build.sh release    # local release key, dist/HzLab-1.0.1.apk
 ```
 
 The first build creates a local signing key under `signing/`. That directory is git-ignored; **back it up** if you publish updates. The GitHub Actions workflow builds a debug APK without access to any release key.
 
 The build is intentionally tool-light: `aapt2`, `javac`, `d8`, `zipalign` and `apksigner` from the Android SDK/JDK. No Gradle or Android Studio is required.
 
-Maintainers: see [PUBLISHING.md](PUBLISHING.md) for the release workflow.
+Maintainers: see [PUBLISHING.md](PUBLISHING.md) for the release workflow. F-Droid listing metadata lives under `fastlane/`; the portable unsigned build is `fdroid-build.sh`.
 
 ## Project layout
 

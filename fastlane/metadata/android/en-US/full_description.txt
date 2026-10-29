@@ -1,0 +1,26 @@
+HzLab is a modern chromatic tuner and pitch visualiser for Android, built for current 64-bit phones and tablets.
+
+It brings five complementary tuning displays into one offline app:
+
+• Instrument — a radial strobe with string indicators for the selected tuning. Upper harmonics are folded back to the intended string, so a bright harmonic does not appear as an unrelated high note.
+• Dial & Strobe — a cent scale with a moving needle and a linear strobe. Flat moves left; sharp moves right.
+• Spectrogram — a scrolling 240-bin pitch display with 5-cent resolution, a live cents readout, and enough detail to see vibrato and microtonal drift.
+• Chords — a 12 by 6 grid for major, major 7th, dominant 7th, minor, minor 7th and diminished chords, with temporal smoothing and root/bass weighting.
+• Big Strobe — a large single-strobe display for small screens and hands-free tuning.
+
+Tunings and temperaments:
+
+• 52 built-in instrument tunings, including guitar, bass, violin, fiddle, mandolin, ukulele, banjo, bouzouki and pedal steel.
+• 17 temperaments, including equal temperament and historical temperaments such as Kirnberger, Meantone, Pythagorean, Valotti and Young.
+• Custom instruments with up to 12 strings or notes.
+• Custom 12-note temperaments with editable cent offsets.
+• A4 reference from 220 to 880 Hz in 0.1 Hz steps, sharp/flat note names and selectable in-tune sensitivity.
+
+Privacy and design:
+
+• Audio is processed entirely on the device. HzLab does not record, save, upload or share microphone audio.
+• No ads, analytics, trackers, accounts or network permission.
+• Pure Java, with no native libraries or ABI-specific binaries.
+• Supports Android 6.0 and newer, including 64-bit-only devices.
+
+HzLab is free software under the GNU General Public License v3.0 or later. Source code and issue tracking are available on GitHub.
