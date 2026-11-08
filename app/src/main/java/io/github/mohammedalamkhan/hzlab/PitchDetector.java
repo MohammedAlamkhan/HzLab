@@ -32,6 +32,10 @@ public final class PitchDetector {
 
     public float rms;
     public float confidence;
+    /** Advanced settings, copied from Settings before each analysis. */
+    public float noiseGateRms = 0.0008f;
+    public float minClarity = 0.36f;
+    public float spectroGamma = 0.72f;
     /** Low-frequency (bass) chroma used to identify the root of a chord. */
     public final float[] bassChroma = new float[12];
     /** Chroma limited to the fundamental register, for chord estimation. */
@@ -103,7 +107,7 @@ public final class PitchDetector {
             prefix[i + 1] = prefix[i] + v * v;
         }
         rms = (float) Math.sqrt(energy / n);
-        if (rms < 0.0008f) {
+        if (rms < noiseGateRms) {
             confidence = 0;
             clear(chromaOut, 0);
             clear(spectro, 0);
@@ -159,7 +163,7 @@ public final class PitchDetector {
                 }
             }
         }
-        if (peakCount == 0 || globalMax < 0.30) {
+        if (peakCount == 0 || globalMax < minClarity * (0.30f / 0.36f)) {
             confidence = (float) Math.max(0, globalMax);
             buildChroma(chromaOut, a4);
             return 0;
@@ -209,7 +213,7 @@ public final class PitchDetector {
             normaliseSpectro();
         }
 
-        if (frequency < MIN_FREQUENCY || frequency > MAX_FREQUENCY || confidence < 0.36) {
+        if (frequency < MIN_FREQUENCY || frequency > MAX_FREQUENCY || confidence < minClarity) {
             return 0;
         }
         return frequency;
@@ -367,7 +371,7 @@ public final class PitchDetector {
         }
         for (int i = 0; i < SPECTRO_BINS; i++) {
             float v = spectro[i] / max;
-            spectro[i] = (float) Math.pow(Math.max(0f, v), 0.72f);
+            spectro[i] = (float) Math.pow(Math.max(0f, v), spectroGamma);
         }
     }
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.2 — Advanced DSP controls
+
+- Added a persistent Advanced DSP section: noise gate, clarity threshold, harmonic search depth, pitch smoothing, spectrogram contrast, spectrogram speed, chord gate and chord smoothing.
+- Defaults are the previous hardcoded values, so existing behaviour is unchanged until a control is adjusted.
+- Added accessible slider dialogs with live values and range labels.
+- No change to tuning or temperament data.
+
+
 ## 1.0.1 — F-Droid preparation
 
 - Add Fastlane listing metadata (title, descriptions, screenshots, changelogs).

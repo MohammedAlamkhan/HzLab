@@ -159,7 +159,8 @@ public final class HzLabView extends View {
                 if (Math.abs(nextCents - displayCents) > 80) {
                     displayCents = nextCents;
                 } else {
-                    displayCents = displayCents * 0.72 + nextCents * 0.28;
+                    displayCents = displayCents * settings.pitchSmoothing
+                            + nextCents * (1.0 - settings.pitchSmoothing);
                 }
                 updateTargetString();
             } else {
@@ -659,30 +660,32 @@ public final class HzLabView extends View {
             return;
         }
         lastSpectroFrame = pitch.timestampNanos;
-        int shift = 1;
+        int shift = Math.max(1, Math.min(4, settings.spectroScroll));
         System.arraycopy(spectroPixels, shift, spectroPixels, 0, spectroPixels.length - shift);
-        int base = SPECTRO_WIDTH - shift;
-        for (int b = 0; b < SPECTRO_ROWS; b++) {
-            // Bitmap row 0 is displayed at the top. Bin 240 is just above B,
-            // bin 0 just below C; the note lines sit at bins 10, 30, ... 230.
-            int pixelRow = SPECTRO_ROWS - 1 - b;
-            float value = pitch.spectro[b];
-            if (pitch.rms < 0.0012f) {
-                value = 0f;
-            } else {
-                value = Math.max(0f, (value - 0.06f) / 0.94f);
+        for (int column = 0; column < shift; column++) {
+            int base = SPECTRO_WIDTH - shift + column;
+            for (int b = 0; b < SPECTRO_ROWS; b++) {
+                // Bitmap row 0 is displayed at the top. Bin 240 is just above B,
+                // bin 0 just below C; the note lines sit at bins 10, 30, ... 230.
+                int pixelRow = SPECTRO_ROWS - 1 - b;
+                float value = pitch.spectro[b];
+                if (pitch.rms < 0.0012f) {
+                    value = 0f;
+                } else {
+                    value = Math.max(0f, (value - 0.06f) / 0.94f);
+                }
+                value = Math.min(1f, value);
+                int pc = Math.min(11, Math.max(0, (int) ((b + 0.5f) / SPECTRO_BINS_PER_SEMITONE)));
+                int alpha = (int) (255 * Math.pow(value, 0.82));
+                int colour = spectroPalette[pc];
+                int r = (colour >> 16) & 0xff;
+                int g = (colour >> 8) & 0xff;
+                int bl = colour & 0xff;
+                int rr = (int) (r * (0.28f + 0.72f * value));
+                int gg = (int) (g * (0.28f + 0.72f * value));
+                int bb = (int) (bl * (0.28f + 0.72f * value));
+                spectroPixels[pixelRow * SPECTRO_WIDTH + base] = Color.argb(alpha, rr, gg, bb);
             }
-            value = Math.min(1f, value);
-            int pc = Math.min(11, Math.max(0, (int) ((b + 0.5f) / SPECTRO_BINS_PER_SEMITONE)));
-            int alpha = (int) (255 * Math.pow(value, 0.82));
-            int colour = spectroPalette[pc];
-            int r = (colour >> 16) & 0xff;
-            int g = (colour >> 8) & 0xff;
-            int bl = colour & 0xff;
-            int rr = (int) (r * (0.28f + 0.72f * value));
-            int gg = (int) (g * (0.28f + 0.72f * value));
-            int bb = (int) (bl * (0.28f + 0.72f * value));
-            spectroPixels[pixelRow * SPECTRO_WIDTH + base] = Color.argb(alpha, rr, gg, bb);
         }
         spectroBitmap.setPixels(spectroPixels, 0, SPECTRO_WIDTH, 0, 0, SPECTRO_WIDTH, SPECTRO_ROWS);
     }
@@ -812,7 +815,8 @@ public final class HzLabView extends View {
             coverage = totalEnergy > 0.001f ? chordEnergy / totalEnergy : 0;
         }
         boolean recent = (SystemClock.elapsedRealtimeNanos() - lastChordFrame) < 500_000_000L;
-        boolean signal = recent && result != null && result.rms > 0.002f && bestScore > 0.05f;
+        float chordDisplayGate = Math.max(0.002f, settings.chordGateRms * (0.002f / 0.0015f));
+        boolean signal = recent && result != null && result.rms > chordDisplayGate && bestScore > 0.05f;
         // Show a chord tile whenever a plausible chord is present. Confidence
         // changes the brightness; it must not hide the whole grid during real
         // strummed chords, where 7th/relative-minor templates often run close.
@@ -879,7 +883,7 @@ public final class HzLabView extends View {
             return;
         }
         lastChordResultTimestamp = pitch.timestampNanos;
-        if (pitch.rms < 0.0015f) {
+        if (pitch.rms < settings.chordGateRms) {
             return;
         }
         long now = SystemClock.elapsedRealtimeNanos();
@@ -892,9 +896,12 @@ public final class HzLabView extends View {
         // elapsed-realtime clock. They have different zero points across deep
         // sleep on real phones, so never compare the two directly.
         lastChordFrame = now;
+        float smoothing = settings.chordSmoothing;
         for (int i = 0; i < 12; i++) {
-            smoothedChordChroma[i] = smoothedChordChroma[i] * 0.72f + pitch.chordChroma[i] * 0.28f;
-            smoothedBassChroma[i] = smoothedBassChroma[i] * 0.72f + pitch.bassChroma[i] * 0.28f;
+            smoothedChordChroma[i] = smoothedChordChroma[i] * smoothing
+                    + pitch.chordChroma[i] * (1f - smoothing);
+            smoothedBassChroma[i] = smoothedBassChroma[i] * smoothing
+                    + pitch.bassChroma[i] * (1f - smoothing);
         }
         float[] raw = computeChordScores(smoothedChordChroma, smoothedBassChroma);
         System.arraycopy(raw, 0, chordScores, 0, chordScores.length);

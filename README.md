@@ -30,9 +30,9 @@ This is a **clean-room reimplementation**, not a repackaging of the original app
 
 Get the latest signed APK from the [GitHub Releases page](https://github.com/MohammedAlamkhan/HzLab/releases/latest).
 
-Direct file for `v1.0.1`:
+Direct file for `v1.0.2`:
 
-**[HzLab-1.0.1.apk](https://github.com/MohammedAlamkhan/HzLab/releases/download/v1.0.1/HzLab-1.0.1.apk)**
+**[HzLab-1.0.2.apk](https://github.com/MohammedAlamkhan/HzLab/releases/download/v1.0.2/HzLab-1.0.2.apk)**
 
 - Android 6.0 (API 23) or newer
 - arm64, armeabi-v7a or x86 — no ABI-specific binaries
@@ -48,7 +48,7 @@ Direct file for `v1.0.1`:
 ### Install with ADB
 
 ```bash
-adb install -r HzLab-1.0.1.apk
+adb install -r HzLab-1.0.2.apk
 ```
 
 ## Screenshots
@@ -60,8 +60,8 @@ adb install -r HzLab-1.0.1.apk
 | ![Instrument](docs/screenshots/instrument.png) | ![Dial & Strobe](docs/screenshots/dial-strobe.png) |
 | **Spectrogram** | **Chords** |
 | ![Spectrogram](docs/screenshots/spectrogram.png) | ![Chords](docs/screenshots/chords.png) |
-| **Big Strobe** | **Settings** |
-| ![Big Strobe](docs/screenshots/big-strobe.png) | ![Settings](docs/screenshots/settings.png) |
+| **Big Strobe** | **Advanced DSP** |
+| ![Big Strobe](docs/screenshots/big-strobe.png) | ![Advanced DSP](docs/screenshots/advanced.png) |
 
 ## Features
 
@@ -82,7 +82,9 @@ adb install -r HzLab-1.0.1.apk
 - **A4 reference** from 220 to 880 Hz in 0.1 Hz steps.
 - **Sharp/flat notation**, 5/10/15-cent in-tune threshold and dynamic/landscape/portrait orientation.
 - **Input control** — 44.1, 22.05, 11.025 and 8 kHz sample rates with automatic fallback; low/medium/high analysis rate.
+- **Advanced DSP controls** — noise gate, clarity threshold, harmonic search depth, pitch smoothing, spectrogram contrast/speed, chord gate and chord smoothing. Defaults preserve the original tuning behaviour.
 - Settings and custom definitions persist between launches.
+- Every advanced control opens a slider with its current value; Save applies it immediately and keeps it across launches.
 
 ## How it works
 
@@ -140,8 +142,8 @@ Requirements:
 ```bash
 git clone https://github.com/MohammedAlamkhan/HzLab.git
 cd HzLab
-./build.sh debug      # unsigned debug tooling key, dist/HzLab-1.0.1-debug.apk
-./build.sh release    # local release key, dist/HzLab-1.0.1.apk
+./build.sh debug      # unsigned debug tooling key, dist/HzLab-1.0.2-debug.apk
+./build.sh release    # local release key, dist/HzLab-1.0.2.apk
 ```
 
 The first build creates a local signing key under `signing/`. That directory is git-ignored; **back it up** if you publish updates. The GitHub Actions workflow builds a debug APK without access to any release key.

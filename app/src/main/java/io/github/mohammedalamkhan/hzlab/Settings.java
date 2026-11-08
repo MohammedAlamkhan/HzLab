@@ -25,6 +25,16 @@ public final class Settings {
     public int screenOrientation = 0;     // 0 dynamic, 1 landscape, 2 portrait
     public int viewedMask = 0;
     public int spectrogramTexture = 5;
+    // Advanced DSP parameters. Defaults are the values that were hardcoded
+    // before these controls existed, so existing behaviour is unchanged.
+    public volatile float noiseGateRms = 0.0008f;
+    public volatile float minClarity = 0.36f;
+    public volatile int harmonicDepth = 8;
+    public volatile float pitchSmoothing = 0.72f;
+    public volatile float spectroGamma = 0.72f;
+    public volatile int spectroScroll = 1;
+    public volatile float chordGateRms = 0.0015f;
+    public volatile float chordSmoothing = 0.72f;
     public String audioSetupVersion = "";
     public String audioAnalysisVersion = "";
     public String instrumentName = "";
@@ -61,6 +71,14 @@ public final class Settings {
         screenOrientation = p.getInt("screenOrientation", 0);
         viewedMask = p.getInt("usageMask", 0);
         spectrogramTexture = p.getInt("texTypeSpectrogram", 5);
+        noiseGateRms = p.getFloat("noiseGateRms", 0.0008f);
+        minClarity = p.getFloat("minClarity", 0.36f);
+        harmonicDepth = p.getInt("harmonicDepth", 8);
+        pitchSmoothing = p.getFloat("pitchSmoothing", 0.72f);
+        spectroGamma = p.getFloat("spectroGamma", 0.72f);
+        spectroScroll = p.getInt("spectroScroll", 1);
+        chordGateRms = p.getFloat("chordGateRms", 0.0015f);
+        chordSmoothing = p.getFloat("chordSmoothing", 0.72f);
         audioSetupVersion = p.getString("audioSetupVersion", "");
         audioAnalysisVersion = p.getString("audioAnalysisVersion", "");
         instrumentName = p.getString("instrumentName", "");
@@ -119,6 +137,30 @@ public final class Settings {
         if (inTuneThreshold < 1.0f) {
             inTuneThreshold = 5.0f;
         }
+        if (noiseGateRms < 0.00005f || noiseGateRms > 0.02f) {
+            noiseGateRms = 0.0008f;
+        }
+        if (minClarity < 0.05f || minClarity > 0.95f) {
+            minClarity = 0.36f;
+        }
+        if (harmonicDepth < 1 || harmonicDepth > 8) {
+            harmonicDepth = 8;
+        }
+        if (pitchSmoothing < 0f || pitchSmoothing > 0.95f) {
+            pitchSmoothing = 0.72f;
+        }
+        if (spectroGamma < 0.3f || spectroGamma > 1.5f) {
+            spectroGamma = 0.72f;
+        }
+        if (spectroScroll < 1 || spectroScroll > 4) {
+            spectroScroll = 1;
+        }
+        if (chordGateRms < 0.0002f || chordGateRms > 0.02f) {
+            chordGateRms = 0.0015f;
+        }
+        if (chordSmoothing < 0f || chordSmoothing > 0.95f) {
+            chordSmoothing = 0.72f;
+        }
     }
 
     public Tuning selectedTuning() {
@@ -156,6 +198,14 @@ public final class Settings {
         e.putInt("screenOrientation", screenOrientation);
         e.putInt("usageMask", viewedMask);
         e.putInt("texTypeSpectrogram", spectrogramTexture);
+        e.putFloat("noiseGateRms", noiseGateRms);
+        e.putFloat("minClarity", minClarity);
+        e.putInt("harmonicDepth", harmonicDepth);
+        e.putFloat("pitchSmoothing", pitchSmoothing);
+        e.putFloat("spectroGamma", spectroGamma);
+        e.putInt("spectroScroll", spectroScroll);
+        e.putFloat("chordGateRms", chordGateRms);
+        e.putFloat("chordSmoothing", chordSmoothing);
         e.putString("audioSetupVersion", audioSetupVersion);
         e.putString("audioAnalysisVersion", audioAnalysisVersion);
         e.putString("instrumentName", instrumentName);
@@ -194,6 +244,14 @@ public final class Settings {
         screenOrientation = 0;
         viewedMask = 0;
         spectrogramTexture = 5;
+        noiseGateRms = 0.0008f;
+        minClarity = 0.36f;
+        harmonicDepth = 8;
+        pitchSmoothing = 0.72f;
+        spectroGamma = 0.72f;
+        spectroScroll = 1;
+        chordGateRms = 0.0015f;
+        chordSmoothing = 0.72f;
         audioSetupVersion = "";
         audioAnalysisVersion = "";
         instrumentName = InstrumentLibrary.builtIns().get(0).name;

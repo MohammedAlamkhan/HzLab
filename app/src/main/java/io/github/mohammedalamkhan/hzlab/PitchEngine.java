@@ -192,6 +192,9 @@ public final class PitchEngine implements AudioCapture.Listener {
                 System.arraycopy(ring, 0, frame, first, window - first);
             }
         }
+        detector.noiseGateRms = settings.noiseGateRms;
+        detector.minClarity = settings.minClarity;
+        detector.spectroGamma = settings.spectroGamma;
         double raw = detector.analyse(frame, window, chroma, settings.a4);
         if (raw > 0 && settings.viewMode == HzLabView.MODE_INSTRUMENT) {
             raw = foldToInstrument(raw);
@@ -212,7 +215,8 @@ public final class PitchEngine implements AudioCapture.Listener {
                 if (lastFrequency > 0 && now - lastPitchNanos < 250000000L) {
                     double cents = 1200.0 * Math.log(frequency / lastFrequency) / Math.log(2.0);
                     if (Math.abs(cents) < 18.0) {
-                        frequency = lastFrequency * 0.72 + frequency * 0.28;
+                        frequency = lastFrequency * settings.pitchSmoothing
+                                + frequency * (1f - settings.pitchSmoothing);
                     }
                 }
                 lastFrequency = frequency;
@@ -260,8 +264,8 @@ public final class PitchEngine implements AudioCapture.Listener {
         double max = highest * Math.pow(2.0, 3.0 / 12.0);
         double bestHz = 0;
         double bestCents = 1e9;
-        // Check the fundamental and its first seven harmonics.
-        for (int divisor = 1; divisor <= 8; divisor++) {
+        // Check the fundamental and the harmonics selected by the user.
+        for (int divisor = 1; divisor <= settings.harmonicDepth; divisor++) {
             double candidate = raw / divisor;
             if (candidate < min * 0.94 || candidate > max * 1.06) {
                 continue;

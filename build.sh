@@ -22,8 +22,8 @@ SIGNING="$ROOT/signing"
 KEYSTORE="$SIGNING/hzlab-release.jks"
 KS_PASS_FILE="$SIGNING/hzlab-release.pass"
 KS_ALIAS="hzlab"
-VERSION_CODE="2"
-VERSION_NAME="1.0.1"
+VERSION_CODE="3"
+VERSION_NAME="1.0.2"
 MODE="${1:-release}"
 
 for tool in "$JAVA_HOME/bin/javac" "$BT/aapt2" "$BT/d8" "$BT/zipalign" "$PLATFORM"; do

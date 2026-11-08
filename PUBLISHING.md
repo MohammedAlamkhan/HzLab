@@ -11,7 +11,7 @@ gh auth login --hostname github.com --git-protocol https --web
 ./publish.sh
 ```
 
-`publish.sh` rebuilds and verifies the APK, updates `dist/SHA256SUMS.txt`, pushes `main` and the `v1.0.1` tag, then creates or updates the GitHub release with the APK and checksum file.
+`publish.sh` rebuilds and verifies the APK, updates `dist/SHA256SUMS.txt`, pushes `main` and the `v1.0.2` tag, then creates or updates the GitHub release with the APK and checksum file.
 
 If the release already exists, the script uploads the new APK/checksum with `--clobber` instead of failing.
 

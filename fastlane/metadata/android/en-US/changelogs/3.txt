@@ -1,0 +1,1 @@
+HzLab 1.0.2 adds a persistent Advanced DSP section: noise gate, clarity threshold, harmonic search depth, pitch smoothing, spectrogram contrast and speed, chord gate and chord smoothing. All defaults preserve the previous behaviour.

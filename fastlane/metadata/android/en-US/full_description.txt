@@ -8,6 +8,8 @@ It brings five complementary tuning displays into one offline app:
 • Chords — a 12 by 6 grid for major, major 7th, dominant 7th, minor, minor 7th and diminished chords, with temporal smoothing and root/bass weighting.
 • Big Strobe — a large single-strobe display for small screens and hands-free tuning.
 
+Advanced DSP controls let you adapt the tuner to your instrument and room: noise gate, clarity threshold, harmonic search depth, pitch smoothing, spectrogram contrast and speed, chord gate and chord smoothing. Defaults preserve the original behaviour.
+
 Tunings and temperaments:
 
 • 52 built-in instrument tunings, including guitar, bass, violin, fiddle, mandolin, ukulele, banjo, bouzouki and pedal steel.
