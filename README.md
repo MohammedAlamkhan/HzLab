@@ -31,9 +31,9 @@ This is a **clean-room reimplementation**, not a repackaging of the original app
 
 Get the latest signed APK from the [GitHub Releases page](https://github.com/MohammedAlamkhan/HzLab/releases/latest).
 
-Direct file for `v1.0.3`:
+Direct file for `v1.0.4`:
 
-**[HzLab-1.0.3.apk](https://github.com/MohammedAlamkhan/HzLab/releases/download/v1.0.3/HzLab-1.0.3.apk)**
+**[HzLab-1.0.4.apk](https://github.com/MohammedAlamkhan/HzLab/releases/download/v1.0.4/HzLab-1.0.4.apk)**
 
 - Android 6.0 (API 23) or newer
 - arm64, armeabi-v7a or x86 — no ABI-specific binaries
@@ -49,7 +49,7 @@ Direct file for `v1.0.3`:
 ### Install with ADB
 
 ```bash
-adb install -r HzLab-1.0.3.apk
+adb install -r HzLab-1.0.4.apk
 ```
 
 ## Screenshots
@@ -63,6 +63,10 @@ adb install -r HzLab-1.0.3.apk
 | ![Spectrogram](docs/screenshots/spectrogram.png) | ![Chords](docs/screenshots/chords.png) |
 | **Big Strobe** | **Advanced DSP** |
 | ![Big Strobe](docs/screenshots/big-strobe.png) | ![Advanced DSP](docs/screenshots/advanced.png) |
+| **Metronome** | **Reference tone** |
+| ![Metronome](docs/screenshots/metronome.png) | ![Reference tone](docs/screenshots/tone.png) |
+| **Daylight theme** | **Pitch black theme** |
+| ![Daylight](docs/screenshots/theme-light.png) | ![Pitch black](docs/screenshots/theme-black.png) |
 
 ## Features
 
@@ -73,6 +77,19 @@ adb install -r HzLab-1.0.3.apk
 - **Spectrogram** — a 240-bin continuous pitch axis (5 cents per bin) with a live cents readout. Vibrato and microtones are visible instead of being flattened into 12 pitch classes.
 - **Chords** — a 12 × 6 grid for major, major 7th, dominant 7th, minor, minor 7th and diminished chords. Includes temporal smoothing, root/bass weighting and candidate cells.
 - **Big Strobe** — a large single-strobe display for small screens.
+
+### Practice tools
+
+- **Metronome** — 40–240 BPM, tap tempo, 2–12 beats per bar, 1×/2×/4× subdivisions, accented first beat and volume control.
+- **Reference tone** — chromatic note picker across octaves, with the selected A4 reference, temperament and volume. Use headphones while the tuner is listening.
+- **Capo** — transpose the selected instrument tuning and its string targets by 0–12 semitones. The instrument display shows the capo-transposed note names.
+- **Quick presets** — switch instruments from the top menu without opening Settings.
+
+### Appearance
+
+- **Midnight** — deep navy surfaces with cyan accents.
+- **Pitch black** — true-black OLED-friendly background with the same hierarchy.
+- **Daylight** — high-contrast light theme with navy text and blue accents.
 
 ### Tuning tools
 
@@ -143,8 +160,8 @@ Requirements:
 ```bash
 git clone https://github.com/MohammedAlamkhan/HzLab.git
 cd HzLab
-./build.sh debug      # unsigned debug tooling key, dist/HzLab-1.0.3-debug.apk
-./build.sh release    # local release key, dist/HzLab-1.0.3.apk
+./build.sh debug      # unsigned debug tooling key, dist/HzLab-1.0.4-debug.apk
+./build.sh release    # local release key, dist/HzLab-1.0.4.apk
 ```
 
 The first build creates a local signing key under `signing/`. That directory is git-ignored; **back it up** if you publish updates. The GitHub Actions workflow builds a debug APK without access to any release key.

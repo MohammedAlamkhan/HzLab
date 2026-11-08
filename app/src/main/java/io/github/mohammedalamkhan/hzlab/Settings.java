@@ -35,6 +35,17 @@ public final class Settings {
     public volatile int spectroScroll = 1;
     public volatile float chordGateRms = 0.0015f;
     public volatile float chordSmoothing = 0.72f;
+    // Appearance and instrument transposition.
+    public int themeMode = Theme.MIDNIGHT;
+    public int capo = 0;
+    // Practice tools.
+    public int metronomeBpm = 100;
+    public int metronomeBeats = 4;
+    public int metronomeSubdivision = 1;
+    public boolean metronomeAccent = true;
+    public float metronomeVolume = 0.75f;
+    public int toneMidi = 69;
+    public float toneVolume = 0.55f;
     public String audioSetupVersion = "";
     public String audioAnalysisVersion = "";
     public String instrumentName = "";
@@ -79,6 +90,15 @@ public final class Settings {
         spectroScroll = p.getInt("spectroScroll", 1);
         chordGateRms = p.getFloat("chordGateRms", 0.0015f);
         chordSmoothing = p.getFloat("chordSmoothing", 0.72f);
+        themeMode = p.getInt("themeMode", Theme.MIDNIGHT);
+        capo = p.getInt("capo", 0);
+        metronomeBpm = p.getInt("metronomeBpm", 100);
+        metronomeBeats = p.getInt("metronomeBeats", 4);
+        metronomeSubdivision = p.getInt("metronomeSubdivision", 1);
+        metronomeAccent = p.getBoolean("metronomeAccent", true);
+        metronomeVolume = p.getFloat("metronomeVolume", 0.75f);
+        toneMidi = p.getInt("toneMidi", 69);
+        toneVolume = p.getFloat("toneVolume", 0.55f);
         audioSetupVersion = p.getString("audioSetupVersion", "");
         audioAnalysisVersion = p.getString("audioAnalysisVersion", "");
         instrumentName = p.getString("instrumentName", "");
@@ -161,6 +181,36 @@ public final class Settings {
         if (chordSmoothing < 0f || chordSmoothing > 0.95f) {
             chordSmoothing = 0.72f;
         }
+        if (themeMode < Theme.MIDNIGHT || themeMode > Theme.DAYLIGHT) {
+            themeMode = Theme.MIDNIGHT;
+        }
+        if (capo < 0 || capo > 12) {
+            capo = 0;
+        }
+        if (metronomeBpm < 40 || metronomeBpm > 240) {
+            metronomeBpm = 100;
+        }
+        if (metronomeBeats < 2 || metronomeBeats > 12) {
+            metronomeBeats = 4;
+        }
+        if (metronomeSubdivision != 2 && metronomeSubdivision != 4) {
+            metronomeSubdivision = 1;
+        }
+        if (metronomeVolume < 0f || metronomeVolume > 1f) {
+            metronomeVolume = 0.75f;
+        }
+        if (toneMidi < 12 || toneMidi > 120) {
+            toneMidi = 69;
+        }
+        if (toneVolume < 0f || toneVolume > 1f) {
+            toneVolume = 0.55f;
+        }
+    }
+
+    /** Read the theme before an Activity calls super.onCreate(). */
+    public static int readTheme(Context context) {
+        return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                .getInt("themeMode", Theme.MIDNIGHT);
     }
 
     public Tuning selectedTuning() {
@@ -206,6 +256,15 @@ public final class Settings {
         e.putInt("spectroScroll", spectroScroll);
         e.putFloat("chordGateRms", chordGateRms);
         e.putFloat("chordSmoothing", chordSmoothing);
+        e.putInt("themeMode", themeMode);
+        e.putInt("capo", capo);
+        e.putInt("metronomeBpm", metronomeBpm);
+        e.putInt("metronomeBeats", metronomeBeats);
+        e.putInt("metronomeSubdivision", metronomeSubdivision);
+        e.putBoolean("metronomeAccent", metronomeAccent);
+        e.putFloat("metronomeVolume", metronomeVolume);
+        e.putInt("toneMidi", toneMidi);
+        e.putFloat("toneVolume", toneVolume);
         e.putString("audioSetupVersion", audioSetupVersion);
         e.putString("audioAnalysisVersion", audioAnalysisVersion);
         e.putString("instrumentName", instrumentName);
@@ -252,6 +311,15 @@ public final class Settings {
         spectroScroll = 1;
         chordGateRms = 0.0015f;
         chordSmoothing = 0.72f;
+        themeMode = Theme.MIDNIGHT;
+        capo = 0;
+        metronomeBpm = 100;
+        metronomeBeats = 4;
+        metronomeSubdivision = 1;
+        metronomeAccent = true;
+        metronomeVolume = 0.75f;
+        toneMidi = 69;
+        toneVolume = 0.55f;
         audioSetupVersion = "";
         audioAnalysisVersion = "";
         instrumentName = InstrumentLibrary.builtIns().get(0).name;

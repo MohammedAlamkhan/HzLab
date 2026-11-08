@@ -4,6 +4,7 @@ package io.github.mohammedalamkhan.hzlab;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
@@ -36,35 +37,45 @@ public final class OptionsActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        int theme = Settings.readTheme(this);
+        setTheme(theme == Theme.DAYLIGHT ? R.style.Theme_HzLab_Light : R.style.Theme_HzLab);
         super.onCreate(savedInstanceState);
         settings = Settings.get(this);
+        Theme.apply(settings.themeMode);
         condensed = Typeface.create("sans-serif-medium", Typeface.NORMAL);
-        getWindow().setStatusBarColor(Color.BLACK);
-        getWindow().setNavigationBarColor(Color.BLACK);
+        getWindow().setStatusBarColor(Theme.bgTop);
+        getWindow().setNavigationBarColor(Theme.bgBottom);
+        int uiFlags = getWindow().getDecorView().getSystemUiVisibility();
+        if (Theme.light) {
+            uiFlags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+        } else {
+            uiFlags &= ~(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+        }
+        getWindow().getDecorView().setSystemUiVisibility(uiFlags);
         buildUi();
     }
 
     private void buildUi() {
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(0xff07131e);
+        root.setBackgroundColor(Theme.bgTop);
 
         LinearLayout header = new LinearLayout(this);
         header.setOrientation(LinearLayout.HORIZONTAL);
         header.setGravity(Gravity.CENTER_VERTICAL);
         header.setPadding(dp(16), dp(14), dp(16), dp(14));
-        header.setBackgroundColor(0xff0b1723);
+        header.setBackgroundColor(Theme.surface);
 
         TextView back = new TextView(this);
         back.setText("<");
-        back.setTextColor(0xffdceeff);
+        back.setTextColor(Theme.text);
         back.setTextSize(24);
         back.setTypeface(condensed);
         back.setGravity(Gravity.CENTER);
         GradientDrawable backBg = new GradientDrawable();
         backBg.setShape(GradientDrawable.OVAL);
-        backBg.setColor(0xff132335);
-        backBg.setStroke(dp(1), 0xff20384c);
+        backBg.setColor(Theme.raised);
+        backBg.setStroke(dp(1), Theme.border);
         back.setBackground(backBg);
         back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,11 +90,11 @@ public final class OptionsActivity extends Activity {
         titles.setPadding(dp(12), 0, 0, 0);
         TextView title = new TextView(this);
         title.setText("Settings");
-        title.setTextColor(0xfff3f8fc);
+        title.setTextColor(Theme.text);
         title.setTextSize(22);
         title.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
         subtitle = new TextView(this);
-        subtitle.setTextColor(0xff91a7ba);
+        subtitle.setTextColor(Theme.dim);
         subtitle.setTextSize(11);
         subtitle.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
         titles.addView(title);
@@ -92,7 +103,7 @@ public final class OptionsActivity extends Activity {
         root.addView(header, new LinearLayout.LayoutParams(-1, -2));
 
         View headerLine = new View(this);
-        headerLine.setBackgroundColor(0xff20384c);
+        headerLine.setBackgroundColor(Theme.border);
         root.addView(headerLine, new LinearLayout.LayoutParams(-1, dp(1)));
 
         ScrollView scroll = new ScrollView(this);
@@ -111,6 +122,14 @@ public final class OptionsActivity extends Activity {
         content.removeAllViews();
         subtitle.setText(settings.selectedTuning().displayName() + "  ·  A4 "
                 + String.format(Locale.US, "%.1f", settings.a4) + " Hz");
+
+        addSection("Appearance");
+        addRow("Theme", "Midnight navy, pitch black, or daylight.", new Runnable() {
+            @Override
+            public void run() {
+                chooseTheme();
+            }
+        });
 
         addSection("Instrument");
         addRow("Preset Instrument", "Pick a built-in tuning for guitar, bass, violin, banjo, ukulele, mandolin and more.", new Runnable() {
@@ -132,7 +151,7 @@ public final class OptionsActivity extends Activity {
         });
 
         addSection("Tuning");
-        addRow("A4 Frequency (hz)", "Set the reference pitch for A4.", new Runnable() {
+        addRow("A4 Reference", "Set the reference pitch for A4.", new Runnable() {
             @Override
             public void run() {
                 editA4();
@@ -155,6 +174,12 @@ public final class OptionsActivity extends Activity {
                 });
             }
         });
+        addRow("Capo", "Transpose the selected instrument tuning up to 12 semitones.", new Runnable() {
+            @Override
+            public void run() {
+                editCapo();
+            }
+        });
 
         addSection("Display");
         addRow("Display Settings", "Choose note names, in-tune sensitivity and screen orientation.", new Runnable() {
@@ -175,6 +200,20 @@ public final class OptionsActivity extends Activity {
             @Override
             public void run() {
                 chooseAnalysisRate();
+            }
+        });
+
+        addSection("Practice tools");
+        addRow("Metronome", "Steady click with tap tempo, accents and subdivisions.", new Runnable() {
+            @Override
+            public void run() {
+                startActivity(new Intent(OptionsActivity.this, MetronomeActivity.class));
+            }
+        });
+        addRow("Reference Tone", "Play a tuning reference note, with the selected temperament and A4.", new Runnable() {
+            @Override
+            public void run() {
+                startActivity(new Intent(OptionsActivity.this, ToneActivity.class));
             }
         });
 
@@ -246,7 +285,7 @@ public final class OptionsActivity extends Activity {
     private void addSection(String title) {
         TextView tv = new TextView(this);
         tv.setText(title.toUpperCase(Locale.US));
-        tv.setTextColor(0xff91a7ba);
+        tv.setTextColor(Theme.dim);
         tv.setTextSize(10);
         tv.setLetterSpacing(0.14f);
         tv.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
@@ -261,21 +300,21 @@ public final class OptionsActivity extends Activity {
         row.setPadding(dp(16), dp(14), dp(12), dp(14));
 
         GradientDrawable background = new GradientDrawable();
-        background.setColor(0xff0d1926);
+        background.setColor(Theme.surface);
         background.setCornerRadius(dp(16));
-        background.setStroke(dp(1), 0xff20384c);
-        row.setBackground(new RippleDrawable(ColorStateList.valueOf(0x22ffffff), background, null));
+        background.setStroke(dp(1), Theme.border);
+        row.setBackground(new RippleDrawable(ColorStateList.valueOf(Theme.light ? 0x22000000 : 0x22ffffff), background, null));
 
         LinearLayout texts = new LinearLayout(this);
         texts.setOrientation(LinearLayout.VERTICAL);
         TextView titleView = new TextView(this);
         titleView.setText(title);
-        titleView.setTextColor(0xfff3f8fc);
+        titleView.setTextColor(Theme.text);
         titleView.setTextSize(16);
         titleView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
         TextView desc = new TextView(this);
         desc.setText(description);
-        desc.setTextColor(0xff91a7ba);
+        desc.setTextColor(Theme.dim);
         desc.setTextSize(12);
         desc.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
         desc.setPadding(0, dp(3), 0, 0);
@@ -285,7 +324,7 @@ public final class OptionsActivity extends Activity {
 
         TextView chevron = new TextView(this);
         chevron.setText("›");
-        chevron.setTextColor(0xff536a7d);
+        chevron.setTextColor(Theme.faint);
         chevron.setTextSize(24);
         chevron.setTypeface(condensed);
         chevron.setGravity(Gravity.CENTER);
@@ -536,15 +575,15 @@ public final class OptionsActivity extends Activity {
         row.setPadding(0, dp(8), 0, dp(8));
         TextView title = new TextView(this);
         title.setText(label);
-        title.setTextColor(0xffe6e6e6);
+        title.setTextColor(Theme.text);
         title.setTextSize(15);
         row.addView(title, new LinearLayout.LayoutParams(0, -2, 1));
         TextView valueView = new TextView(this);
         valueView.setText(value);
-        valueView.setTextColor(0xff67c9ff);
+        valueView.setTextColor(Theme.accentBright);
         valueView.setTextSize(15);
         valueView.setPadding(dp(10), dp(4), dp(10), dp(4));
-        valueView.setBackgroundColor(0xff152a3b);
+        valueView.setBackgroundColor(Theme.raised);
         row.addView(valueView, new LinearLayout.LayoutParams(-2, -2));
         parent.addView(row);
         return valueView;
@@ -645,13 +684,13 @@ public final class OptionsActivity extends Activity {
 
         TextView descriptionView = new TextView(this);
         descriptionView.setText(description);
-        descriptionView.setTextColor(0xff9a9a9a);
+        descriptionView.setTextColor(Theme.dim);
         descriptionView.setTextSize(13);
         descriptionView.setTypeface(condensed);
         box.addView(descriptionView);
 
         final TextView valueView = new TextView(this);
-        valueView.setTextColor(0xff67c9ff);
+        valueView.setTextColor(Theme.accentBright);
         valueView.setTextSize(22);
         valueView.setTypeface(condensed);
         valueView.setPadding(0, dp(10), 0, 0);
@@ -684,7 +723,7 @@ public final class OptionsActivity extends Activity {
 
         TextView range = new TextView(this);
         range.setText(rangeLabel(min, format, percent) + "  —  " + rangeLabel(max, format, percent));
-        range.setTextColor(0xff777777);
+        range.setTextColor(Theme.faint);
         range.setTextSize(11);
         range.setTypeface(condensed);
         box.addView(range);
@@ -716,6 +755,33 @@ public final class OptionsActivity extends Activity {
 
     private String rangeLabel(float value, String format, boolean percent) {
         return formatValue(value, format, percent);
+    }
+
+    private void chooseTheme() {
+        final String[] names = {"Midnight", "Pitch black", "Daylight"};
+        new AlertDialog.Builder(this)
+                .setTitle("Theme")
+                .setSingleChoiceItems(names, settings.themeMode, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        settings.themeMode = which;
+                        settings.save(OptionsActivity.this);
+                        Theme.apply(which);
+                        recreate();
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void editCapo() {
+        showSliderDialog("Capo", "Transpose the selected tuning and its string targets up to 12 semitones.",
+                0f, 12f, settings.capo, "%.0f", false, new FloatSetter() {
+                    @Override
+                    public void set(float value) {
+                        settings.capo = Math.round(value);
+                    }
+                });
     }
 
     private void chooseSampleRate() {
@@ -791,9 +857,15 @@ public final class OptionsActivity extends Activity {
                 .setPositiveButton("Reset", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        int oldTheme = settings.themeMode;
                         settings.resetKeepCustom();
                         settings.save(OptionsActivity.this);
-                        rebuildRows();
+                        if (oldTheme != settings.themeMode) {
+                            Theme.apply(settings.themeMode);
+                            recreate();
+                        } else {
+                            rebuildRows();
+                        }
                         Toast.makeText(OptionsActivity.this, "Settings reset", Toast.LENGTH_SHORT).show();
                     }
                 })

@@ -6,7 +6,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -16,6 +15,8 @@ import android.view.WindowInsetsController;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
+
+import java.util.List;
 
 public final class MainActivity extends Activity implements HzLabView.Listener, PitchEngine.Listener {
     private static final int REQUEST_MIC = 17;
@@ -27,10 +28,15 @@ public final class MainActivity extends Activity implements HzLabView.Listener, 
     private boolean demo;
     private boolean askedThisSession;
 
+    private int appliedTheme = -1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        appliedTheme = Settings.readTheme(this);
+        setTheme(appliedTheme == Theme.DAYLIGHT ? R.style.Theme_HzLab_Light : R.style.Theme_HzLab);
         super.onCreate(savedInstanceState);
         settings = Settings.get(this);
+        Theme.apply(settings.themeMode);
         int demoMode = getIntent().getIntExtra("demo_mode", -1);
         if (demoMode >= 0 && demoMode < HzLabView.MODE_NAMES.length) {
             settings.viewMode = demoMode;
@@ -39,11 +45,12 @@ public final class MainActivity extends Activity implements HzLabView.Listener, 
                 && getIntent().getBooleanExtra("demo_audio", false);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        getWindow().setStatusBarColor(Color.BLACK);
-        getWindow().setNavigationBarColor(Color.BLACK);
+        getWindow().setStatusBarColor(Theme.bgTop);
+        getWindow().setNavigationBarColor(Theme.bgBottom);
+        updateSystemBarIcons();
 
         FrameLayout root = new FrameLayout(this);
-        root.setBackgroundColor(Color.BLACK);
+        root.setBackgroundColor(Theme.bgBottom);
         view = new HzLabView(this, settings, this);
         root.addView(view, new FrameLayout.LayoutParams(-1, -1));
         setContentView(root);
@@ -151,11 +158,20 @@ public final class MainActivity extends Activity implements HzLabView.Listener, 
     @Override
     protected void onResume() {
         super.onResume();
+        if (settings != null && appliedTheme != settings.themeMode) {
+            recreate();
+            return;
+        }
         resumed = true;
+        Theme.apply(settings.themeMode);
+        updateSystemBarIcons();
         enterImmersive();
         applyOrientation();
         view.refreshSettings();
         settings.ensureValidSelection();
+        if (view.getMode() != settings.viewMode) {
+            view.setMode(settings.viewMode, false);
+        }
         if (demo) {
             view.setPermissionNeeded(false);
             startEngine();
@@ -174,6 +190,16 @@ public final class MainActivity extends Activity implements HzLabView.Listener, 
         settings.viewMode = view.getMode();
         settings.save(this);
         super.onPause();
+    }
+
+    private void updateSystemBarIcons() {
+        int flags = getWindow().getDecorView().getSystemUiVisibility();
+        if (Theme.light) {
+            flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+        } else {
+            flags &= ~(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+        }
+        getWindow().getDecorView().setSystemUiVisibility(flags);
     }
 
     private void applyOrientation() {
@@ -196,25 +222,61 @@ public final class MainActivity extends Activity implements HzLabView.Listener, 
     }
 
     private void showViewMenu() {
-        final String[] items = new String[HzLabView.MODE_NAMES.length + 1];
+        final String[] items = new String[HzLabView.MODE_NAMES.length + 4];
         for (int i = 0; i < HzLabView.MODE_NAMES.length; i++) {
             items[i] = titleCase(HzLabView.MODE_NAMES[i]);
         }
-        items[items.length - 1] = "Options";
+        items[HzLabView.MODE_NAMES.length] = "Quick presets";
+        items[HzLabView.MODE_NAMES.length + 1] = "Metronome";
+        items[HzLabView.MODE_NAMES.length + 2] = "Reference tone";
+        items[HzLabView.MODE_NAMES.length + 3] = "Options";
         AlertDialog.Builder b = new AlertDialog.Builder(this);
-        b.setTitle("HzLab Views");
+        b.setTitle("Views & tools");
         b.setSingleChoiceItems(items, view.getMode(), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
                 if (which < HzLabView.MODE_NAMES.length) {
                     view.setMode(which, true);
+                } else if (which == HzLabView.MODE_NAMES.length) {
+                    showPresetMenu();
+                } else if (which == HzLabView.MODE_NAMES.length + 1) {
+                    startActivity(new Intent(MainActivity.this, MetronomeActivity.class));
+                } else if (which == HzLabView.MODE_NAMES.length + 2) {
+                    startActivity(new Intent(MainActivity.this, ToneActivity.class));
                 } else {
                     openOptions();
                 }
             }
         });
         b.show();
+    }
+
+    private void showPresetMenu() {
+        final List<Tuning> all = InstrumentLibrary.withCustom(settings.customTunings);
+        String[] labels = new String[all.size()];
+        int selected = 0;
+        for (int i = 0; i < all.size(); i++) {
+            labels[i] = all.get(i).displayName() + "   (" + all.get(i).noteText(settings.noteStyle) + ")";
+            if (all.get(i).name.equals(settings.instrumentName)) {
+                selected = i;
+            }
+        }
+        new AlertDialog.Builder(this)
+                .setTitle("Quick presets")
+                .setSingleChoiceItems(labels, selected, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        settings.instrumentName = all.get(which).name;
+                        settings.save(MainActivity.this);
+                        view.setMode(HzLabView.MODE_INSTRUMENT, true);
+                        view.refreshSettings();
+                        Toast.makeText(MainActivity.this, all.get(which).displayName(), Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     private static String titleCase(String value) {

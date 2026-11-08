@@ -3,4 +3,6 @@
     <color name="hzlab_icon_background">#071018</color>
     <color name="hzlab_blue">#54aeff</color>
     <color name="hzlab_black">#000000</color>
+    <color name="hzlab_light_background">#F4F8FC</color>
+    <color name="hzlab_light_accent">#0077B6</color>
 </resources>

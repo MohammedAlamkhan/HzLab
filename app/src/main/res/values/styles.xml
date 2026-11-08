@@ -24,4 +24,17 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
     </style>
+    <style name="Theme.HzLab.Light" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/hzlab_light_background</item>
+        <item name="android:colorAccent">@color/hzlab_light_accent</item>
+        <item name="android:statusBarColor">@color/hzlab_light_background</item>
+        <item name="android:navigationBarColor">@color/hzlab_light_background</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
 </resources>

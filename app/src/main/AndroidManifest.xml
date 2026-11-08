@@ -29,6 +29,20 @@
         </activity>
 
         <activity
+            android:name=".MetronomeActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
+            android:exported="false"
+            android:label="Metronome"
+            android:theme="@style/Theme.HzLab" />
+
+        <activity
+            android:name=".ToneActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
+            android:exported="false"
+            android:label="Reference tone"
+            android:theme="@style/Theme.HzLab" />
+
+        <activity
             android:name=".OptionsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
             android:exported="false"

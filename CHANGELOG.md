@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.4 — Practice tools and themes
+
+- Added a sample-clocked **metronome** with tap tempo, 2–12 beats, 1×/2×/4× subdivisions, accent and volume.
+- Added a **reference tone** screen: chromatic note picker, octave controls, selected A4/temperament and volume.
+- Added **capo/transpose** (0–12 semitones) to the instrument tuning and string targets.
+- Added **quick presets** to the top menu for switching instruments.
+- Added **Midnight**, **Pitch black** and **Daylight** themes, persisted across launches.
+- Added a Tools section to Settings and a redesigned, theme-aware metronome/reference-tone UI.
+- All existing tuner, DSP, gesture and advanced-control behavior remains intact.
+
+
 ## 1.0.3 — Visual overhaul
 
 - New dark design system: deep navy surfaces, cyan accent, refined typography and spacing.

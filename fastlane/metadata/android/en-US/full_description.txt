@@ -10,6 +10,8 @@ It brings five complementary tuning displays into one offline app:
 • Chords — a 12 by 6 grid for major, major 7th, dominant 7th, minor, minor 7th and diminished chords, with temporal smoothing and root/bass weighting.
 • Big Strobe — a large single-strobe display for small screens and hands-free tuning.
 
+Practice tools include a sample-clocked metronome with tap tempo and subdivisions, a continuous reference tone with a chromatic note picker, capo/transpose for instrument tunings, and quick presets for switching instruments. Choose Midnight navy, pitch-black or daylight appearance.
+
 Advanced DSP controls let you adapt the tuner to your instrument and room: noise gate, clarity threshold, harmonic search depth, pitch smoothing, spectrogram contrast and speed, chord gate and chord smoothing. Defaults preserve the original behaviour.
 
 Tunings and temperaments:

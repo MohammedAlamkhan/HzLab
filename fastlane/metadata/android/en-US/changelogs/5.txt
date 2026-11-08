@@ -1,0 +1,1 @@
+HzLab 1.0.4 adds a metronome with tap tempo and subdivisions, a chromatic reference tone, capo/transpose and quick presets, plus Midnight, Pitch black and Daylight themes. Existing tuner, DSP and gesture behaviour is unchanged.

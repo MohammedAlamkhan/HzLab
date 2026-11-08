@@ -252,7 +252,7 @@ public final class PitchEngine implements AudioCapture.Listener {
         double lowest = Double.MAX_VALUE;
         double highest = 0;
         for (int midi : tuning.notes) {
-            double hz = Notes.targetHz(midi, settings.a4, temperament);
+            double hz = Notes.targetHz(midi + settings.capo, settings.a4, temperament);
             if (hz < lowest) {
                 lowest = hz;
             }
@@ -271,7 +271,7 @@ public final class PitchEngine implements AudioCapture.Listener {
                 continue;
             }
             for (int midi : tuning.notes) {
-                double target = Notes.targetHz(midi, settings.a4, temperament);
+                double target = Notes.targetHz(midi + settings.capo, settings.a4, temperament);
                 double cents = 1200.0 * Math.log(candidate / target) / Math.log(2.0);
                 if (Math.abs(cents) < Math.abs(bestCents)) {
                     bestCents = cents;
