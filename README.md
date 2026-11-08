@@ -19,6 +19,7 @@ PitchLab Lite was a distinctive tuner: a chromatic strobe, an instrument-aware r
 
 HzLab keeps the useful musical ideas alive in a form that can be maintained, audited and improved:
 
+- **Modern interface** — a labelled bottom mode bar, a compact app header and card-based settings.
 - **64-bit ready** — the APK contains no native libraries at all.
 - **Offline and private** — microphone audio is analysed locally; there is no network permission, analytics or advertising.
 - **Open source** — the complete implementation is here, under the GPL.
@@ -30,9 +31,9 @@ This is a **clean-room reimplementation**, not a repackaging of the original app
 
 Get the latest signed APK from the [GitHub Releases page](https://github.com/MohammedAlamkhan/HzLab/releases/latest).
 
-Direct file for `v1.0.2`:
+Direct file for `v1.0.3`:
 
-**[HzLab-1.0.2.apk](https://github.com/MohammedAlamkhan/HzLab/releases/download/v1.0.2/HzLab-1.0.2.apk)**
+**[HzLab-1.0.3.apk](https://github.com/MohammedAlamkhan/HzLab/releases/download/v1.0.3/HzLab-1.0.3.apk)**
 
 - Android 6.0 (API 23) or newer
 - arm64, armeabi-v7a or x86 — no ABI-specific binaries
@@ -48,7 +49,7 @@ Direct file for `v1.0.2`:
 ### Install with ADB
 
 ```bash
-adb install -r HzLab-1.0.2.apk
+adb install -r HzLab-1.0.3.apk
 ```
 
 ## Screenshots
@@ -142,8 +143,8 @@ Requirements:
 ```bash
 git clone https://github.com/MohammedAlamkhan/HzLab.git
 cd HzLab
-./build.sh debug      # unsigned debug tooling key, dist/HzLab-1.0.2-debug.apk
-./build.sh release    # local release key, dist/HzLab-1.0.2.apk
+./build.sh debug      # unsigned debug tooling key, dist/HzLab-1.0.3-debug.apk
+./build.sh release    # local release key, dist/HzLab-1.0.3.apk
 ```
 
 The first build creates a local signing key under `signing/`. That directory is git-ignored; **back it up** if you publish updates. The GitHub Actions workflow builds a debug APK without access to any release key.

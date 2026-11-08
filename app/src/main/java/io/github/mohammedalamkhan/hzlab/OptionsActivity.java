@@ -4,7 +4,10 @@ package io.github.mohammedalamkhan.hzlab;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.RippleDrawable;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.InputType;
@@ -35,7 +38,7 @@ public final class OptionsActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         settings = Settings.get(this);
-        condensed = Typeface.create("sans-serif-condensed", Typeface.NORMAL);
+        condensed = Typeface.create("sans-serif-medium", Typeface.NORMAL);
         getWindow().setStatusBarColor(Color.BLACK);
         getWindow().setNavigationBarColor(Color.BLACK);
         buildUi();
@@ -44,48 +47,59 @@ public final class OptionsActivity extends Activity {
     private void buildUi() {
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setBackgroundColor(0xff050505);
+        root.setBackgroundColor(0xff07131e);
 
         LinearLayout header = new LinearLayout(this);
         header.setOrientation(LinearLayout.HORIZONTAL);
         header.setGravity(Gravity.CENTER_VERTICAL);
-        header.setPadding(dp(8), dp(8), dp(8), dp(8));
-        header.setBackgroundColor(0xff151515);
+        header.setPadding(dp(16), dp(14), dp(16), dp(14));
+        header.setBackgroundColor(0xff0b1723);
 
         TextView back = new TextView(this);
         back.setText("<");
-        back.setTextColor(0xffe8e8e8);
-        back.setTextSize(26);
+        back.setTextColor(0xffdceeff);
+        back.setTextSize(24);
+        back.setTypeface(condensed);
         back.setGravity(Gravity.CENTER);
-        back.setPadding(dp(12), 0, dp(12), 0);
+        GradientDrawable backBg = new GradientDrawable();
+        backBg.setShape(GradientDrawable.OVAL);
+        backBg.setColor(0xff132335);
+        backBg.setStroke(dp(1), 0xff20384c);
+        back.setBackground(backBg);
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
             }
         });
-        header.addView(back, new LinearLayout.LayoutParams(-2, dp(48)));
+        header.addView(back, new LinearLayout.LayoutParams(dp(40), dp(40)));
 
         LinearLayout titles = new LinearLayout(this);
         titles.setOrientation(LinearLayout.VERTICAL);
+        titles.setPadding(dp(12), 0, 0, 0);
         TextView title = new TextView(this);
-        title.setText("HzLab Settings");
-        title.setTextColor(0xfff0f0f0);
-        title.setTextSize(20);
-        title.setTypeface(Typeface.create("sans-serif", Typeface.BOLD));
+        title.setText("Settings");
+        title.setTextColor(0xfff3f8fc);
+        title.setTextSize(22);
+        title.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
         subtitle = new TextView(this);
-        subtitle.setTextColor(0xff9a9a9a);
-        subtitle.setTextSize(12);
-        subtitle.setTypeface(condensed);
+        subtitle.setTextColor(0xff91a7ba);
+        subtitle.setTextSize(11);
+        subtitle.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
         titles.addView(title);
         titles.addView(subtitle);
         header.addView(titles, new LinearLayout.LayoutParams(0, -2, 1));
         root.addView(header, new LinearLayout.LayoutParams(-1, -2));
 
+        View headerLine = new View(this);
+        headerLine.setBackgroundColor(0xff20384c);
+        root.addView(headerLine, new LinearLayout.LayoutParams(-1, dp(1)));
+
         ScrollView scroll = new ScrollView(this);
+        scroll.setFillViewport(true);
         content = new LinearLayout(this);
         content.setOrientation(LinearLayout.VERTICAL);
-        content.setPadding(0, dp(4), 0, dp(24));
+        content.setPadding(dp(16), dp(6), dp(16), dp(28));
         scroll.addView(content, new LinearLayout.LayoutParams(-1, -2));
         root.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1));
 
@@ -95,7 +109,7 @@ public final class OptionsActivity extends Activity {
 
     private void rebuildRows() {
         content.removeAllViews();
-        subtitle.setText(settings.selectedTuning().displayName() + "  /  A4 "
+        subtitle.setText(settings.selectedTuning().displayName() + "  ·  A4 "
                 + String.format(Locale.US, "%.1f", settings.a4) + " Hz");
 
         addSection("Instrument");
@@ -232,43 +246,61 @@ public final class OptionsActivity extends Activity {
     private void addSection(String title) {
         TextView tv = new TextView(this);
         tv.setText(title.toUpperCase(Locale.US));
-        tv.setTextColor(0xffa8a8a8);
-        tv.setBackgroundColor(0xff1f1f1f);
-        tv.setTextSize(12);
-        tv.setTypeface(Typeface.create(condensed, Typeface.BOLD));
-        tv.setPadding(dp(14), dp(6), dp(14), dp(6));
+        tv.setTextColor(0xff91a7ba);
+        tv.setTextSize(10);
+        tv.setLetterSpacing(0.14f);
+        tv.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+        tv.setPadding(dp(4), dp(18), dp(4), dp(8));
         content.addView(tv, new LinearLayout.LayoutParams(-1, -2));
     }
 
     private void addRow(String title, String description, final Runnable action) {
         LinearLayout row = new LinearLayout(this);
-        row.setOrientation(LinearLayout.VERTICAL);
-        row.setPadding(dp(16), dp(12), dp(16), dp(12));
-        row.setBackgroundColor(0xff080808);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding(dp(16), dp(14), dp(12), dp(14));
+
+        GradientDrawable background = new GradientDrawable();
+        background.setColor(0xff0d1926);
+        background.setCornerRadius(dp(16));
+        background.setStroke(dp(1), 0xff20384c);
+        row.setBackground(new RippleDrawable(ColorStateList.valueOf(0x22ffffff), background, null));
+
+        LinearLayout texts = new LinearLayout(this);
+        texts.setOrientation(LinearLayout.VERTICAL);
         TextView titleView = new TextView(this);
         titleView.setText(title);
-        titleView.setTextColor(0xfff2f2f2);
-        titleView.setTextSize(19);
-        titleView.setTypeface(condensed);
+        titleView.setTextColor(0xfff3f8fc);
+        titleView.setTextSize(16);
+        titleView.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
         TextView desc = new TextView(this);
         desc.setText(description);
-        desc.setTextColor(0xff9a9a9a);
+        desc.setTextColor(0xff91a7ba);
         desc.setTextSize(12);
-        desc.setTypeface(condensed);
-        desc.setPadding(0, dp(2), 0, 0);
-        row.addView(titleView);
-        row.addView(desc);
+        desc.setTypeface(Typeface.create("sans-serif", Typeface.NORMAL));
+        desc.setPadding(0, dp(3), 0, 0);
+        texts.addView(titleView);
+        texts.addView(desc);
+        row.addView(texts, new LinearLayout.LayoutParams(0, -2, 1));
+
+        TextView chevron = new TextView(this);
+        chevron.setText("›");
+        chevron.setTextColor(0xff536a7d);
+        chevron.setTextSize(24);
+        chevron.setTypeface(condensed);
+        chevron.setGravity(Gravity.CENTER);
+        chevron.setPadding(dp(8), 0, dp(2), 0);
+        row.addView(chevron, new LinearLayout.LayoutParams(-2, -2));
+
         row.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 action.run();
             }
         });
-        content.addView(row, new LinearLayout.LayoutParams(-1, -2));
-
-        View sep = new View(this);
-        sep.setBackgroundColor(0xff272727);
-        content.addView(sep, new LinearLayout.LayoutParams(-1, dp(1)));
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-1, -2);
+        lp.setMargins(0, 0, 0, dp(8));
+        content.addView(row, lp);
     }
 
     private void chooseInstrument() {

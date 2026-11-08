@@ -1,0 +1,1 @@
+HzLab 1.0.3 modernises the interface: a compact app header, labelled five-item bottom navigation, rounded settings cards, refined dark colours and typography, and a refreshed microphone-permission card. Tuning, DSP, gestures and advanced controls are unchanged.

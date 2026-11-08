@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.3 — Visual overhaul
+
+- New dark design system: deep navy surfaces, cyan accent, refined typography and spacing.
+- Compact top app bar with the HzLab wordmark, current mode/listening state and menu button.
+- Labelled five-item bottom navigation replaces the unlabelled dots, with direct mode switching.
+- Redesigned Settings screen with rounded cards, section labels, chevrons and ripple feedback.
+- New microphone-permission card and refreshed dial, spectrogram, chord and strobe layouts.
+- All DSP controls, gestures, tuning data and advanced settings from 1.0.2 are unchanged.
+
+
 ## 1.0.2 — Advanced DSP controls
 
 - Added a persistent Advanced DSP section: noise gate, clarity threshold, harmonic search depth, pitch smoothing, spectrogram contrast, spectrogram speed, chord gate and chord smoothing.

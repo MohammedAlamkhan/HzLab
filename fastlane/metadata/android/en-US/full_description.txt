@@ -1,5 +1,7 @@
 HzLab is a modern chromatic tuner and pitch visualiser for Android, built for current 64-bit phones and tablets.
 
+Its modern dark interface has a compact app header, labelled bottom navigation and card-based settings, while keeping the tuning workflow fast and uncluttered.
+
 It brings five complementary tuning displays into one offline app:
 
 • Instrument — a radial strobe with string indicators for the selected tuning. Upper harmonics are folded back to the intended string, so a bright harmonic does not appear as an unrelated high note.

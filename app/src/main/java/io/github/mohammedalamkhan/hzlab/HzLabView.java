@@ -5,7 +5,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
+import android.graphics.Shader;
 import android.graphics.Path;
 import android.graphics.RectF;
 import android.graphics.Typeface;
@@ -39,20 +41,25 @@ public final class HzLabView extends View {
         void onModeChanged(int mode);
     }
 
-    private static final int BG = 0xff000000;
-    private static final int TEXT = 0xffe7e7e7;
-    private static final int DIM = 0xff808080;
-    private static final int FAINT = 0xff3c3c3c;
-    private static final int GRID = 0xff464646;
-    private static final int BLUE = 0xff54aeff;
-    private static final int CYAN = 0xff84dcff;
-    private static final int GREEN = 0xff70dd91;
-    private static final int AMBER = 0xffffc45c;
+    private static final int BG_TOP = 0xff07131E;
+    private static final int BG_BOTTOM = 0xff02060A;
+    private static final int SURFACE = 0xff0D1926;
+    private static final int SURFACE_RAISED = 0xff132335;
+    private static final int BORDER = 0xff20384C;
+    private static final int TEXT = 0xffF3F8FC;
+    private static final int DIM = 0xff91A7BA;
+    private static final int FAINT = 0xff536A7D;
+    private static final int GRID = 0xff2A4054;
+    private static final int BLUE = 0xff5CC8FF;
+    private static final int CYAN = 0xff8CE7FF;
+    private static final int GREEN = 0xff63E6A8;
+    private static final int AMBER = 0xffF5C86A;
 
     private final Settings settings;
     private final Listener listener;
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint stroke = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint uiPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Path path = new Path();
     private final RectF oval = new RectF();
     private final GestureDetector gesture;
@@ -97,6 +104,7 @@ public final class HzLabView extends View {
             0xffff5b9e, 0xffff5d5d, 0xffff9b4a, 0xffffe45c
     };
 
+    private static final String[] MODE_SHORT_NAMES = {"Tune", "Dial", "Spectra", "Chords", "Strobe"};
     private static final String[] CHORD_LABELS = {"maj", "maj7", "dom7", "min", "min7", "dim"};
     private static final int[][] CHORD_INTERVALS = {
             {0, 4, 7}, {0, 4, 7, 11}, {0, 4, 7, 10}, {0, 3, 7}, {0, 3, 7, 10}, {0, 3, 6, 9}
@@ -108,9 +116,9 @@ public final class HzLabView extends View {
         this.listener = listener;
         this.mode = settings.viewMode;
         density = getResources().getDisplayMetrics().density;
-        condensed = Typeface.create("sans-serif-condensed", Typeface.NORMAL);
+        condensed = Typeface.create("sans-serif-medium", Typeface.NORMAL);
         regular = Typeface.create("sans-serif", Typeface.NORMAL);
-        paint.setTypeface(condensed);
+        paint.setTypeface(regular);
         stroke.setStyle(Paint.Style.STROKE);
         gesture = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
             @Override
@@ -140,7 +148,7 @@ public final class HzLabView extends View {
                 return false;
             }
         });
-        setBackgroundColor(BG);
+        setBackgroundColor(BG_BOTTOM);
         setKeepScreenOn(true);
     }
 
@@ -278,12 +286,17 @@ public final class HzLabView extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            if (showPermission || audioMessage != null) {
+                listener.onRequestPermission();
+                return true;
+            }
             if (gearHit(event.getX(), event.getY())) {
                 listener.onRequestOptions();
                 return true;
             }
-            if (showPermission || audioMessage != null) {
-                listener.onRequestPermission();
+            int tappedMode = modeAt(event.getX(), event.getY());
+            if (tappedMode >= 0) {
+                setMode(tappedMode, true);
                 return true;
             }
         }
@@ -293,15 +306,25 @@ public final class HzLabView extends View {
 
     private boolean gearHit(float x, float y) {
         int w = getWidth();
+        return x > w - dp(68) && y < dp(72);
+    }
+
+    /** Returns the bottom-mode-bar item at a point, or -1. */
+    private int modeAt(float x, float y) {
+        int w = getWidth();
         int h = getHeight();
-        return x > w - dp(62)
-                && (y < dp(92) || y > h - dp(64));
+        float top = h - dp(76);
+        if (y < top || y > h - dp(8) || x < dp(10) || x > w - dp(10)) {
+            return -1;
+        }
+        int index = (int) ((x - dp(10)) / ((w - dp(20)) / 5f));
+        return index < 0 || index >= MODE_NAMES.length ? -1 : index;
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.drawColor(BG);
+        drawBackdrop(canvas);
         long now = System.nanoTime();
         float dt = lastFrameNanos == 0 ? 0.016f : Math.min(0.05f, (now - lastFrameNanos) / 1e9f);
         lastFrameNanos = now;
@@ -366,11 +389,11 @@ public final class HzLabView extends View {
         for (int i = 0; i < count; i++) {
             float y = firstY + i * spacing;
             boolean active = i == targetString;
-            stroke.setColor(active ? 0xffc8c8c8 : 0xff5a5a5a);
+            stroke.setColor(active ? 0xffd9f4ff : 0xff294258);
             stroke.setStrokeWidth(active ? dp(1.4f) : dp(0.8f));
             canvas.drawLine(0, y, w, y, stroke);
             if (active) {
-                stroke.setColor(0x3354aeff);
+                stroke.setColor(0x335cc8ff);
                 stroke.setStrokeWidth(dp(7));
                 canvas.drawLine(0, y, w, y, stroke);
             }
@@ -388,7 +411,7 @@ public final class HzLabView extends View {
 
         // Outer tuning ring.
         oval.set(cx - rx, cy - ry, cx + rx, cy + ry);
-        stroke.setColor(0xff6f6f6f);
+        stroke.setColor(0xff365167);
         stroke.setStrokeWidth(dp(1.5f));
         canvas.drawOval(oval, stroke);
 
@@ -401,7 +424,7 @@ public final class HzLabView extends View {
             float inner = major ? 0.865f : 0.885f;
             float x1 = (float) (cx + Math.cos(angle) * rx * inner);
             float y1 = (float) (cy + Math.sin(angle) * ry * inner);
-            stroke.setColor(major ? 0xffb0b0b0 : 0xff666666);
+            stroke.setColor(major ? 0xff8fb4c8 : 0xff3e5a70);
             stroke.setStrokeWidth(major ? dp(1.5f) : dp(0.8f));
             canvas.drawLine(x0, y0, x1, y1, stroke);
         }
@@ -416,7 +439,7 @@ public final class HzLabView extends View {
         for (int i = 0; i < segments; i++) {
             float start = i * sweep + phaseOffset;
             boolean bright = (i & 1) == 0;
-            stroke.setColor(bright ? 0xffb4b4b4 : 0xff303030);
+            stroke.setColor(bright ? 0xff8fb4c8 : 0xff1a2b3a);
             canvas.drawArc(oval, start, sweep * 0.58f, false, stroke);
         }
 
@@ -426,7 +449,7 @@ public final class HzLabView extends View {
             float base = 90f + (float) clamp(displayCents, -50, 50) * 0.75f;
             float arcSweep = 42f;
             oval.set(cx - rx * 1.005f, cy - ry * 0.985f, cx + rx * 1.005f, cy + ry * 0.985f);
-            stroke.setColor(0x3354aeff);
+            stroke.setColor(0x335cc8ff);
             stroke.setStrokeWidth(dp(10));
             canvas.drawArc(oval, base - arcSweep / 2, arcSweep, false, stroke);
             stroke.setColor(BLUE);
@@ -472,17 +495,17 @@ public final class HzLabView extends View {
                 canvas.drawText(note + "   " + Notes.formatHz(result.frequency), cx, cy, paint);
             }
         } else if (!showPermission && audioMessage == null) {
-            paint.setColor(0xff6e6e6e);
+            paint.setColor(0xff6f8799);
             paint.setTextSize(font(16f));
             canvas.drawText("PLAY A NOTE", cx, cy, paint);
             paint.setTextSize(font(11f));
             canvas.drawText("LISTENING FOR PITCH", cx, cy + dp(24), paint);
         }
 
-        paint.setColor(TEXT);
-        paint.setTextSize(font(17f));
+        paint.setColor(DIM);
+        paint.setTextSize(font(12f));
         paint.setTextAlign(Paint.Align.CENTER);
-        canvas.drawText(tuning.displayName(), cx, h - dp(35), paint);
+        canvas.drawText(tuning.displayName(), cx, h - dp(101), paint);
     }
 
     // ---------------------------------------------------------------------
@@ -498,7 +521,7 @@ public final class HzLabView extends View {
 
         // Scale arc.
         oval.set(cx - radius, cy - radius, cx + radius, cy + radius);
-        stroke.setColor(0xff656565);
+        stroke.setColor(0xff365167);
         stroke.setStrokeWidth(dp(1.5f));
         canvas.drawArc(oval, 200, 140, false, stroke);
 
@@ -512,11 +535,11 @@ public final class HzLabView extends View {
             float y0 = (float) (cy + Math.sin(angle) * inner);
             float x1 = (float) (cx + Math.cos(angle) * outer);
             float y1 = (float) (cy + Math.sin(angle) * outer);
-            stroke.setColor(major ? 0xffbcbcbc : 0xff777777);
+            stroke.setColor(major ? 0xff9fc0d4 : 0xff587184);
             stroke.setStrokeWidth(major ? dp(1.6f) : dp(0.9f));
             canvas.drawLine(x0, y0, x1, y1, stroke);
             if (major) {
-                paint.setColor(i == 0 ? TEXT : 0xffa0a0a0);
+                paint.setColor(i == 0 ? TEXT : 0xff7893a8);
                 paint.setTextSize(font(13f));
                 paint.setTextAlign(Paint.Align.CENTER);
                 float tx = (float) (cx + Math.cos(angle) * (radius + dp(17)));
@@ -554,7 +577,7 @@ public final class HzLabView extends View {
             paint.setTextSize(font(62f));
             String note = Notes.name(result.midi, settings.noteStyle);
             canvas.drawText(note, cx, h * 0.70f, paint);
-            paint.setColor(0xffb4b4b4);
+            paint.setColor(0xff8fb4c8);
             paint.setTextSize(font(22f));
             canvas.drawText(Notes.formatHz(result.frequency), cx, h * 0.755f, paint);
             paint.setColor(Math.abs(cents) <= settings.inTuneThreshold ? GREEN : TEXT);
@@ -563,7 +586,7 @@ public final class HzLabView extends View {
                     : cents < 0 ? "TUNE UP" : "TUNE DOWN";
             canvas.drawText(direction + "   " + Notes.formatCents(cents) + " cents", cx, h * 0.80f, paint);
         } else if (!showPermission && audioMessage == null) {
-            paint.setColor(0xff7d7d7d);
+            paint.setColor(0xff6f8799);
             paint.setTextSize(font(44f));
             canvas.drawText("--", cx, h * 0.70f, paint);
             paint.setTextSize(font(18f));
@@ -638,7 +661,7 @@ public final class HzLabView extends View {
             canvas.drawText((tuned ? "IN TUNE!" : displayCents < 0 ? "TUNE UP" : "TUNE DOWN")
                     + "   " + Notes.formatCents(displayCents) + " cents", w * 0.5f, h * 0.80f, paint);
         } else {
-            paint.setColor(0xff777777);
+            paint.setColor(0xff587184);
             paint.setTextSize(font(18f));
             canvas.drawText("PLAY A NOTE", w * 0.5f, h * 0.71f, paint);
         }
@@ -699,8 +722,8 @@ public final class HzLabView extends View {
         int h = getHeight();
         float left = w * 0.145f;
         float right = w * 0.97f;
-        float top = h * 0.045f;
-        float bottom = h * 0.955f;
+        float top = h * 0.135f;
+        float bottom = h - dp(100);
         if (spectroBitmap == null) {
             ensureSpectrogram();
         }
@@ -719,19 +742,19 @@ public final class HzLabView extends View {
         for (int pc = 0; pc < 12; pc++) {
             float bin = (pc + 0.5f) * SPECTRO_BINS_PER_SEMITONE;
             float y = spectroY(bin, top, bottom);
-            stroke.setColor(pc == 0 ? 0xff777777 : 0xff4a4a4a);
+            stroke.setColor(pc == 0 ? 0xff587184 : 0xff2b455b);
             stroke.setStrokeWidth(dp(1));
             canvas.drawLine(left, y, right, y, stroke);
-            paint.setColor(0xffdedede);
+            paint.setColor(0xffdcecf7);
             paint.setTextSize(font(20f));
             paint.setTextAlign(Paint.Align.LEFT);
             String label = Notes.pitchClass(pc, settings.noteStyle);
             canvas.drawText(label, dp(13), y + font(20f) * 0.34f, paint);
         }
-        stroke.setColor(0xff5b5b5b);
+        stroke.setColor(0xff365167);
         stroke.setStrokeWidth(dp(1));
         canvas.drawRect(left, top, right, bottom, stroke);
-        stroke.setColor(0xff262626);
+        stroke.setColor(0xff1a2b3a);
         for (int i = 1; i < 12; i++) {
             float x = left + (right - left) * i / 12f;
             canvas.drawLine(x, top, x, bottom, stroke);
@@ -755,18 +778,18 @@ public final class HzLabView extends View {
             paint.setTextAlign(Paint.Align.LEFT);
             paint.setTextSize(font(13f));
             String readout = Notes.name(nearest, settings.noteStyle) + "  " + Notes.formatCents(cents) + " cents";
-            canvas.drawText(readout, left + dp(2), dp(26), paint);
+            canvas.drawText(readout, left + dp(2), top - dp(12), paint);
         } else {
             paint.setTextAlign(Paint.Align.LEFT);
             paint.setTextSize(font(11f));
-            paint.setColor(0xff666666);
-            canvas.drawText("PLAY A NOTE", left + dp(2), dp(26), paint);
+            paint.setColor(FAINT);
+            canvas.drawText("PLAY A NOTE", left + dp(2), top - dp(12), paint);
         }
 
         paint.setTextAlign(Paint.Align.LEFT);
         paint.setTextSize(font(11f));
-        paint.setColor(0xff6c6c6c);
-        canvas.drawText("CHROMA / TIME  ·  5-cent resolution", dp(13), h - dp(31), paint);
+        paint.setColor(FAINT);
+        canvas.drawText("CHROMA / TIME  ·  5-CENT RESOLUTION", dp(13), h - dp(92), paint);
     }
 
     // ---------------------------------------------------------------------
@@ -777,8 +800,8 @@ public final class HzLabView extends View {
         int h = getHeight();
         float left = dp(52);
         float right = w - dp(14);
-        float top = dp(42);
-        float bottom = h - dp(52);
+        float top = dp(90);
+        float bottom = h - dp(105);
         float cellW = (right - left) / 6f;
         float cellH = (bottom - top) / 12f;
 
@@ -831,19 +854,19 @@ public final class HzLabView extends View {
             for (int col = 0; col < 6; col++) {
                 float x = left + col * cellW;
                 int index = pc * 6 + col;
-                int fill = 0xff050505;
+                int fill = 0xff0d1926;
                 if (display && index == bestIndex) {
-                    fill = confident ? 0xff67c9ff : 0xff2f7fa8;
+                    fill = confident ? 0xff8ce7ff : 0xff2a7397;
                 } else if (display && scores[index] > bestScore * 0.85f) {
-                    fill = 0xff1d4f6c;
+                    fill = 0xff1a4e69;
                 }
                 paint.setColor(fill);
                 canvas.drawRect(x + dp(1), y + dp(1), x + cellW - dp(1), y + cellH - dp(1), paint);
-                stroke.setColor(0xff414141);
+                stroke.setColor(0xff294258);
                 stroke.setStrokeWidth(dp(0.8f));
                 canvas.drawRect(x, y, x + cellW, y + cellH, stroke);
             }
-            paint.setColor(0xffdedede);
+            paint.setColor(0xffdcecf7);
             paint.setTextSize(font(19f));
             paint.setTextAlign(Paint.Align.LEFT);
             canvas.drawText(Notes.pitchClass(pc, settings.noteStyle), dp(13), y + cellH * 0.5f + font(19f) * 0.33f, paint);
@@ -854,13 +877,13 @@ public final class HzLabView extends View {
             float x = left + (col + 0.5f) * cellW;
             canvas.save();
             canvas.rotate(-90, x, bottom + dp(8));
-            paint.setColor(0xffdedede);
+            paint.setColor(0xffdcecf7);
             paint.setTextSize(font(16f));
             paint.setTextAlign(Paint.Align.LEFT);
             canvas.drawText(CHORD_LABELS[col], x - cellH * 0.3f, bottom + dp(8), paint);
             canvas.restore();
         }
-        stroke.setColor(0xff5a5a5a);
+        stroke.setColor(0xff294258);
         stroke.setStrokeWidth(dp(1));
         canvas.drawRect(left, top, right, bottom, stroke);
 
@@ -868,7 +891,7 @@ public final class HzLabView extends View {
             int pc = bestIndex / 6;
             int type = bestIndex % 6;
             paint.setTextAlign(Paint.Align.CENTER);
-            paint.setColor(confident ? CYAN : 0xff8db8cb);
+            paint.setColor(confident ? CYAN : 0xff8fc9df);
             paint.setTextSize(font(13f));
             canvas.drawText(Notes.pitchClass(pc, settings.noteStyle) + " " + CHORD_LABELS[type].toUpperCase(Locale.US),
                     (left + right) * 0.5f, top - dp(11), paint);
@@ -974,45 +997,92 @@ public final class HzLabView extends View {
     // ---------------------------------------------------------------------
     // Chrome and status
 
-    private void drawChrome(Canvas canvas, long now) {
+    private void drawBackdrop(Canvas canvas) {
         int w = getWidth();
         int h = getHeight();
+        uiPaint.setStyle(Paint.Style.FILL);
+        uiPaint.setShader(new LinearGradient(0, 0, 0, h, BG_TOP, BG_BOTTOM, Shader.TileMode.CLAMP));
+        canvas.drawRect(0, 0, w, h, uiPaint);
+        uiPaint.setShader(null);
+    }
+
+    private void drawChrome(Canvas canvas, long now) {
+        drawTopBar(canvas);
+        drawBottomNav(canvas);
+    }
+
+    private void drawTopBar(Canvas canvas) {
+        int w = getWidth();
+        float barBottom = dp(72);
+        uiPaint.setStyle(Paint.Style.FILL);
+        uiPaint.setColor(0xE60B1723);
+        canvas.drawRect(0, 0, w, barBottom, uiPaint);
+        uiPaint.setColor(BORDER);
+        canvas.drawRect(0, barBottom - dp(1), w, barBottom, uiPaint);
+
         paint.setTypeface(condensed);
         paint.setTextAlign(Paint.Align.LEFT);
-        paint.setColor(0xff777777);
-        paint.setTextSize(font(11f));
-        if (now < modeLabelUntil) {
-            canvas.drawText(MODE_NAMES[mode], dp(18), dp(26), paint);
-        }
+        paint.setColor(TEXT);
+        paint.setTextSize(font(22f));
+        canvas.drawText("HzLab", dp(22), dp(35), paint);
+        paint.setTypeface(regular);
+        paint.setColor(DIM);
+        paint.setTextSize(font(9f));
+        paint.setLetterSpacing(0.14f);
+        canvas.drawText(MODE_NAMES[mode] + "  ·  " + (audioStarted ? "LISTENING" : "READY"), dp(23), dp(55), paint);
+        paint.setLetterSpacing(0);
 
-        // Kebab menu. This makes the old long-press menu discoverable on modern
-        // phones while keeping long-press as a secondary gesture.
-        paint.setColor(0xffb8b8b8);
-        float gx = w - dp(25);
-        float gy = dp(58);
+        // Rounded menu button with a compact sliders glyph.
+        float cx = w - dp(35);
+        float cy = dp(36);
+        uiPaint.setStyle(Paint.Style.FILL);
+        uiPaint.setColor(SURFACE_RAISED);
+        canvas.drawCircle(cx, cy, dp(20), uiPaint);
+        stroke.setColor(BORDER);
+        stroke.setStrokeWidth(dp(1));
+        canvas.drawCircle(cx, cy, dp(20), stroke);
+        stroke.setColor(DIM);
+        stroke.setStrokeWidth(dp(1.4f));
         for (int i = -1; i <= 1; i++) {
-            canvas.drawCircle(gx, gy + i * dp(5.2f), dp(1.7f), paint);
+            float y = cy + i * dp(6);
+            canvas.drawLine(cx - dp(7), y, cx + dp(7), y, stroke);
         }
-        // A second, always reachable menu affordance sits above the mode dots.
-        float my = h - dp(40);
-        for (int i = -1; i <= 1; i++) {
-            canvas.drawCircle(gx, my + i * dp(4.2f), dp(1.5f), paint);
-        }
+        paint.setColor(BLUE);
+        canvas.drawCircle(cx - dp(3), cy - dp(6), dp(1.8f), paint);
+        canvas.drawCircle(cx + dp(2), cy, dp(1.8f), paint);
+        canvas.drawCircle(cx - dp(1), cy + dp(6), dp(1.8f), paint);
+    }
 
-        // Mode dots.
-        float dotY = h - dp(12);
-        float gap = dp(14);
-        float start = w * 0.5f - (MODE_NAMES.length - 1) * gap * 0.5f;
+    private void drawBottomNav(Canvas canvas) {
+        int w = getWidth();
+        int h = getHeight();
+        float top = h - dp(76);
+        float bottom = h - dp(8);
+        float left = dp(10);
+        float right = w - dp(10);
+        float itemWidth = (right - left) / MODE_NAMES.length;
+
+        uiPaint.setStyle(Paint.Style.FILL);
+        uiPaint.setColor(0xF20D1926);
+        canvas.drawRoundRect(left, top, right, bottom, dp(24), dp(24), uiPaint);
+        stroke.setColor(BORDER);
+        stroke.setStrokeWidth(dp(1));
+        canvas.drawRoundRect(left, top, right, bottom, dp(24), dp(24), stroke);
+
         for (int i = 0; i < MODE_NAMES.length; i++) {
-            paint.setColor(i == mode ? BLUE : 0xff444444);
-            canvas.drawCircle(start + i * gap, dotY, dp(i == mode ? 2.8f : 2.1f), paint);
-        }
-
-        if (audioMessage != null) {
-            paint.setColor(AMBER);
+            float itemLeft = left + i * itemWidth;
+            float center = itemLeft + itemWidth * 0.5f;
+            boolean active = i == mode;
+            if (active) {
+                uiPaint.setColor(0x335CC8FF);
+                canvas.drawRoundRect(itemLeft + dp(3), top + dp(6),
+                        itemLeft + itemWidth - dp(3), bottom - dp(6), dp(18), dp(18), uiPaint);
+            }
+            paint.setTypeface(active ? condensed : regular);
             paint.setTextAlign(Paint.Align.CENTER);
-            paint.setTextSize(font(11f));
-            canvas.drawText(audioMessage, w * 0.5f, h - dp(31), paint);
+            paint.setTextSize(font(10f));
+            paint.setColor(active ? CYAN : DIM);
+            canvas.drawText(MODE_SHORT_NAMES[i], center, top + dp(40), paint);
         }
     }
 
@@ -1020,21 +1090,41 @@ public final class HzLabView extends View {
         int w = getWidth();
         int h = getHeight();
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(0xdd000000);
+        paint.setColor(0xE6000000);
         canvas.drawRect(0, 0, w, h, paint);
+
+        float left = w * 0.08f;
+        float right = w * 0.92f;
+        float top = h * 0.34f;
+        float bottom = h * 0.66f;
+        uiPaint.setStyle(Paint.Style.FILL);
+        uiPaint.setColor(SURFACE);
+        canvas.drawRoundRect(left, top, right, bottom, dp(24), dp(24), uiPaint);
+        stroke.setColor(BORDER);
+        stroke.setStrokeWidth(dp(1));
+        canvas.drawRoundRect(left, top, right, bottom, dp(24), dp(24), stroke);
+
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setTypeface(condensed);
         paint.setColor(TEXT);
-        paint.setTextSize(font(24f));
-        canvas.drawText("MICROPHONE ACCESS", w * 0.5f, h * 0.43f, paint);
-        paint.setColor(0xffb0b0b0);
-        paint.setTextSize(font(14f));
+        paint.setTextSize(font(22f));
+        canvas.drawText("Microphone access", w * 0.5f, top + dp(46), paint);
+        paint.setTypeface(regular);
+        paint.setColor(DIM);
+        paint.setTextSize(font(13f));
         String message = audioMessage != null ? audioMessage
-                : "HzLab needs the microphone to tune your instrument.";
-        drawMultiline(canvas, message, w * 0.5f, h * 0.49f, w * 0.78f, font(14f), dp(21));
-        paint.setColor(BLUE);
-        paint.setTextSize(font(15f));
-        canvas.drawText("TAP TO " + (audioMessage != null ? "RETRY" : "ALLOW ACCESS"), w * 0.5f, h * 0.61f, paint);
+                : "HzLab needs the microphone to tune your instrument. Audio stays on this device.";
+        drawMultiline(canvas, message, w * 0.5f, top + dp(78), right - left - dp(40), font(13f), dp(20));
+
+        float buttonTop = bottom - dp(58);
+        float buttonBottom = bottom - dp(16);
+        uiPaint.setColor(0x335CC8FF);
+        canvas.drawRoundRect(left + dp(20), buttonTop, right - dp(20), buttonBottom, dp(18), dp(18), uiPaint);
+        paint.setTypeface(condensed);
+        paint.setColor(CYAN);
+        paint.setTextSize(font(14f));
+        canvas.drawText(audioMessage != null ? "TAP TO RETRY" : "TAP TO ALLOW ACCESS",
+                w * 0.5f, buttonTop + dp(27), paint);
     }
 
     private void drawMultiline(Canvas canvas, String text, float cx, float top, float maxWidth, float textSize, float lineHeight) {
